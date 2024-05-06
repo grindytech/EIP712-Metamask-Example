@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import OpenMarkV4  from "../ABI/OpenMarkV4.json";
 
-const OPENMARK = "0xFE5f411481565fbF70D8D33D992C78196E014b90";
+const OPENMARK = "0xE28a1b108B07C9Cfa4636165Ee7cA3927ee17797";
 
 const SignMessage = () => {
     const [data, setData] = useState({ domain: {}, message: {} });
@@ -45,7 +45,7 @@ const SignMessage = () => {
             const domain = {
                 "name": "OpenMark",
                 "version": "1",
-                "chainId": 31337,
+                "chainId": Number(await openMark.getChainId()),
                 "verifyingContract": OPENMARK,
             };
          
