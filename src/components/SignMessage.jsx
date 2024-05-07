@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-import OpenMarkV4  from "../ABI/OpenMarkV4.json";
+import OpenMarkV4 from "../ABI/OpenMarkV4.json";
 
-const OPENMARK = "0xE28a1b108B07C9Cfa4636165Ee7cA3927ee17797";
+function getRandomBytes32() {
+    const array = new Uint8Array(32);
+    window.crypto.getRandomValues(array);
+    return array;
+}
+
+const OPENMARK = "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB";
 
 const SignMessage = () => {
     const [data, setData] = useState({ domain: {}, message: {} });
@@ -27,7 +33,7 @@ const SignMessage = () => {
                     { name: 'nftContract', type: 'address' },
                     { name: 'tokenId', type: 'uint256' },
                     { name: 'price', type: 'uint256' },
-                    { name: 'saltNonce', type: 'uint256' },
+                    { name: 'salt', type: 'bytes32' },
                     { name: 'expiry', type: 'uint256' },
                     { name: 'option', type: 'uint256' },
                 ]
@@ -37,10 +43,12 @@ const SignMessage = () => {
                 "nftContract": OPENMARK,
                 "tokenId": 1,
                 "price": 1,
-                "saltNonce": 1,
+                "salt": getRandomBytes32(),
                 "expiry": 1,
                 "option": 0,
             };
+
+            console.log("order: ", order);
 
             const domain = {
                 "name": "OpenMark",
@@ -48,7 +56,9 @@ const SignMessage = () => {
                 "chainId": Number(await openMark.getChainId()),
                 "verifyingContract": OPENMARK,
             };
-         
+
+            console.log("domain: ", domain);
+
             try {
                 const signature = await signer.signTypedData(domain, types, order);
                 setSignedData(signature);
