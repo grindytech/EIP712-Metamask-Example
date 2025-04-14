@@ -1,4 +1,5 @@
 import React from 'react';
+import SignOrderMessage from './components/SignOrderMessage';
 import SignMessage from './components/SignMessage';
 
 function App() {

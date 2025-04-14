@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-import OpenMarkV4 from "../ABI/OpenMarkV4.json";
-
-function getRandomBytes32() {
-    const array = new Uint8Array(32);
-    window.crypto.getRandomValues(array);
-    return array;
-}
-
-const OPENMARK = "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB";
 
 const SignMessage = () => {
-    const [data, setData] = useState({ domain: {}, message: {} });
-    const [signedData, setSignedData] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
 
     const handleClick = async () => {
@@ -26,46 +15,12 @@ const SignMessage = () => {
             }
 
             const signer = await provider.getSigner();
-            const openMark = new ethers.Contract(OPENMARK, OpenMarkV4.abi, signer);
 
-            const types = {
-                Order: [
-                    { name: 'nftContract', type: 'address' },
-                    { name: 'tokenId', type: 'uint256' },
-                    { name: 'price', type: 'uint256' },
-                    { name: 'salt', type: 'bytes32' },
-                    { name: 'expiry', type: 'uint256' },
-                    { name: 'option', type: 'uint256' },
-                ]
-            };
-
-            let order = {
-                "nftContract": OPENMARK,
-                "tokenId": 1,
-                "price": 1,
-                "salt": getRandomBytes32(),
-                "expiry": 1,
-                "option": 0,
-            };
-
-            console.log("order: ", order);
-
-            const domain = {
-                "name": "OpenMark",
-                "version": "1",
-                "chainId": Number(await openMark.getChainId()),
-                "verifyingContract": OPENMARK,
-            };
-
-            console.log("domain: ", domain);
+            const message = "Login to gafi.network with address 0xdA5D86B305C8B1E5458997Cb9D103CE015C9c2A8 on ethereum at 2025-04-14T09:46:55.788Z with nonce 24d09329-cb2a-4e85-97dd-eef73b8c686c";
 
             try {
-                const signature = await signer.signTypedData(domain, types, order);
-                setSignedData(signature);
-
-                const address = await openMark.verify(order, signature);
-
-                console.log("address: ", address);
+                const signature = await signer.signMessage(message);
+                console.log("signature: ", signature);
 
                 setErrorMessage(null);
             } catch (error) {
@@ -77,24 +32,9 @@ const SignMessage = () => {
         }
     };
 
-    const handleDataChange = (event) => {
-        const newData = { ...data };
-        newData[event.target.name] = JSON.parse(event.target.value);
-        setData(newData);
-    };
-
     return (
         <div>
-            <label htmlFor="domain">Domain (JSON):</label>
-            <textarea name="domain" id="domain" rows="5" onChange={handleDataChange} />
-            <br />
-            <label htmlFor="message">Message (JSON):</label>
-            <textarea name="message" id="message" rows="5" onChange={handleDataChange} />
-            <br />
             <button onClick={handleClick}>Sign Message</button>
-            <br />
-            {signedData && <p>Signed Data: {signedData}</p>}
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         </div>
     );
 };
